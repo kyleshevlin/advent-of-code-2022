@@ -16,20 +16,20 @@ Here's my process for solving the problems
 - The problem generally gives you an example of the input and the expected output, use these to write tests in that day's `index.test.js` file.
 - Write the code in that day's `index.js` file.
 - To run the tests, use `npm` or `yarn` to run the `test` script found in the `package.json`. Do this in a terminal that can run Node.
-- Once you think you have the code correct, to get your solution answer set it to a value and log it out to a terminal using Node. I do it like this:
+- Once you think you have the code correct, then in order to get your solution answer, set the result of your code to a value and log it out to a terminal using Node. I do it like this:
 
 ```javascript
 const firstAnswer = someFunction(data)
 console.log(firstAnswer)
 ```
 
-And then in the terminal, let's say it's for Day 1, I would do:
+and then in the terminal, let's say it's for Day 1, I would do:
 
 ```bash
 cd src/day-01
 node index.js
 ```
 
-and observe the output. Be aware that you might run into infinite loops, and there are definitely problems that will not complete because they're designed to be too memory intensive. You'll probably have to kill a node process or two as you solve that challenges.
+and observe the output. Be aware that you might run into infinite loops, and there are definitely problems that will not complete because they're designed to be too memory intensive. You'll probably have to kill a node process or two as you solve these challenges.
 
 It's very rudimentary, but it does the trick.
