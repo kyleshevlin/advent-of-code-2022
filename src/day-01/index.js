@@ -1,6 +1,4 @@
-const { getData } = require('../utils')
-
-const data = getData(__dirname)
+const { getData, sum } = require('../utils')
 
 module.exports = {
   getElves,
@@ -8,14 +6,14 @@ module.exports = {
   getGreatestCalorieSumOfTopThree,
 }
 
+const data = getData(__dirname)
+
 function getElves(input) {
   return input
     .trim()
     .split('\n\n')
     .map(str => str.split('\n').map(Number))
 }
-
-const sum = nums => nums.reduce((x, y) => x + y, 0)
 
 function getGreatestCalorieSum(input) {
   return Math.max(...getElves(input).map(sum))

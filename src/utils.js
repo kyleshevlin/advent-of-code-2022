@@ -7,6 +7,12 @@ function getData(dir) {
   })
 }
 
+const add = (x, y) => x + y
+
+const sum = nums => nums.reduce(add, 0)
+
 module.exports = {
+  add,
   getData,
+  sum,
 }
