@@ -21,7 +21,7 @@ const POINTS_PER_RESULT_TYPE = {
   win: 6,
 }
 
-const COMBOS = {
+const THEM_TO_YOU_TO_RESULT = {
   A: {
     X: 'draw',
     Y: 'win',
@@ -42,8 +42,8 @@ const COMBOS = {
 function getTotalFromPairs(input) {
   return (
     getPairs(input)
-      .map(([them, you]) => [you, COMBOS[them][you]])
-      // .map(trace('after combos'))
+      .map(([them, you]) => [you, THEM_TO_YOU_TO_RESULT[them][you]])
+      // .map(trace('after comparing them and you'))
       .map(
         ([type, result]) =>
           POINTS_PER_TYPE[type] + POINTS_PER_RESULT_TYPE[result]
@@ -56,13 +56,13 @@ function getTotalFromPairs(input) {
 const firstAnswer = getTotalFromPairs(data)
 // console.log(firstAnswer) // 11603
 
-const DESIRED_RESULT = {
+const DESIRED_RESULT_TO_RESULT_TYPE = {
   X: 'lose',
   Y: 'draw',
   Z: 'win',
 }
 
-const THEM_TO_DESIRED_RESULT_TO_WHAT_YOU_SHOULD_THROW = {
+const THEM_TO_DESIRED_RESULT_TO_YOU = {
   A: {
     X: 'Z',
     Y: 'X',
@@ -84,13 +84,13 @@ function alternateGetTotalFromPairs(input) {
   return (
     getPairs(input)
       .map(([them, desiredResult]) => [
-        THEM_TO_DESIRED_RESULT_TO_WHAT_YOU_SHOULD_THROW[them][desiredResult],
-        DESIRED_RESULT[desiredResult],
+        THEM_TO_DESIRED_RESULT_TO_YOU[them][desiredResult],
+        DESIRED_RESULT_TO_RESULT_TYPE[desiredResult],
       ])
       // .map(trace('after first loop'))
       .map(
         ([type, result]) =>
-          POINTS_PER_RESULT_TYPE[result] + POINTS_PER_TYPE[type]
+          POINTS_PER_TYPE[type] + POINTS_PER_RESULT_TYPE[result]
       )
       // .map(trace('after adding'))
       .reduce(add, 0)
