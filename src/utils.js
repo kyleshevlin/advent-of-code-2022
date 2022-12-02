@@ -11,8 +11,11 @@ const add = (x, y) => x + y
 
 const sum = nums => nums.reduce(add, 0)
 
+const trace = msg => x => (console.log(msg, x), x)
+
 module.exports = {
   add,
   getData,
   sum,
+  trace,
 }
