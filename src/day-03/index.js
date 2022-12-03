@@ -1,4 +1,17 @@
-const { add, getData, intersection } = require('../utils')
+/**
+ * Day 3 involved elves carrying items in rucksacks. Each sack had two equal
+ * compartments, but there's ONE item that's incorrectly placed. We gotta find
+ * that item.
+ *
+ * The incorrect item is the single value found in both compartments. This is a
+ * perfect use of Set intersection! Turning the items (characters) of each compartment
+ * into a set makes finding their intersection a breeze.
+ *
+ * After that, it's mapping the character to a numeric value, and summing those
+ * values.
+ */
+
+const { add, getData, intersection, map, pipe, reduce } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -14,22 +27,16 @@ function splitRucksack(item) {
 
 function findSharedItem(...strs) {
   const sets = strs.map(str => new Set([...str]))
-  const [first, second, ...rest] = sets
+  const sharedItem = intersection(...sets)
 
-  let result = intersection(first, second)
-
-  for (const set of rest) {
-    result = intersection(result, set)
-  }
-
-  return Array.from(result)[0]
+  return Array.from(sharedItem)[0]
 }
 
-const characterOrder =
+const CHARACTER_ORDER =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
 function getPriority(item) {
-  const index = characterOrder.findIndex(char => char === item)
+  const index = CHARACTER_ORDER.findIndex(char => char === item)
 
   return index + 1
 }
@@ -37,7 +44,7 @@ function getPriority(item) {
 function solution1(input) {
   return getRucksacks(input)
     .map(splitRucksack)
-    .map(([comp1, comp2]) => findSharedItem(comp1, comp2))
+    .map(compartments => findSharedItem(...compartments))
     .map(getPriority)
     .reduce(add, 0)
 }
@@ -62,12 +69,13 @@ function getGroups(items) {
 }
 
 function solution2(input) {
-  const rucksacks = getRucksacks(input)
-  const groups = getGroups(rucksacks)
-  const badges = groups.map(group => findSharedItem(...group))
-  const result = badges.map(getPriority).reduce(add, 0)
-
-  return result
+  return pipe(
+    getRucksacks,
+    getGroups,
+    map(group => findSharedItem(...group)),
+    map(getPriority),
+    reduce(add, 0)
+  )(input)
 }
 
 const secondAnswer = solution2(data)
