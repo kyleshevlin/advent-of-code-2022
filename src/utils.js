@@ -24,9 +24,22 @@ const sum = nums => nums.reduce(add, 0)
  */
 const trace = msg => x => (console.log(msg, x), x)
 
+function intersection(set1, set2) {
+  const result = new Set()
+
+  for (const item of set1) {
+    if (set2.has(item)) {
+      result.add(item)
+    }
+  }
+
+  return result
+}
+
 module.exports = {
   add,
   getData,
+  intersection,
   sum,
   trace,
 }
