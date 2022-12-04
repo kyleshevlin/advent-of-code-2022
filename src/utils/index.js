@@ -55,6 +55,16 @@ function createStack() {
   }
 }
 
+function createRange(from, to) {
+  const result = []
+
+  for (let i = from; i <= to; i++) {
+    result.push(i)
+  }
+
+  return result
+}
+
 /**
  * Math helpers
  */
@@ -133,6 +143,7 @@ const trace = msg => x => (console.log(msg, x), x)
 module.exports = {
   add,
   createQueue,
+  createRange,
   createStack,
   difference,
   divide,
