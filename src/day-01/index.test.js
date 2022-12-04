@@ -1,8 +1,4 @@
-const {
-  getGreatestCalorieSum,
-  getGreatestCalorieSumOfTopThree,
-  getElves,
-} = require('./')
+const { solution1, solution2, getElves } = require('./')
 
 const input = `
 1000
@@ -31,10 +27,10 @@ test('getElves', () => {
   ])
 })
 
-test('getGreatestCalorieSum', () => {
-  expect(getGreatestCalorieSum(input)).toEqual(24000)
+test('solution1', () => {
+  expect(solution1(input)).toEqual(24000)
 })
 
-test('getGreatestCalorieSumOfTopThree', () => {
-  expect(getGreatestCalorieSumOfTopThree(input)).toEqual(45000)
+test('solution2', () => {
+  expect(solution2(input)).toEqual(45000)
 })

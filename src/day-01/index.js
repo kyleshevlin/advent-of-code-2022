@@ -21,11 +21,11 @@ function getElves(input) {
     .map(str => str.split('\n').map(Number))
 }
 
-function getGreatestCalorieSum(input) {
+function solution1(input) {
   return Math.max(...getElves(input).map(sum))
 }
 
-function getGreatestCalorieSumOfTopThree(input) {
+function solution2(input) {
   const sums = getElves(input)
     .map(sum)
     .sort((a, b) => b - a)
@@ -33,14 +33,14 @@ function getGreatestCalorieSumOfTopThree(input) {
   return sum(sums.slice(0, 3))
 }
 
-const firstAnswer = getGreatestCalorieSum(data)
+const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 68467
 
-const secondAnswer = getGreatestCalorieSumOfTopThree(data)
+const secondAnswer = solution2(data)
 // console.log(secondAnswer) // 203420
 
 module.exports = {
   getElves,
-  getGreatestCalorieSum,
-  getGreatestCalorieSumOfTopThree,
+  solution1,
+  solution2,
 }
