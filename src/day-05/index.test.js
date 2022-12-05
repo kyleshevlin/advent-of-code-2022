@@ -13,9 +13,9 @@ move 1 from 1 to 2
 `
 
 test('solution1', () => {
-  expect(solution1(input, [1, 5, 9])).toEqual('CMZ')
+  expect(solution1(input)).toEqual('CMZ')
 })
 
 test('solution2', () => {
-  expect(solution2(input, [1, 5, 9])).toEqual('MCD')
+  expect(solution2(input)).toEqual('MCD')
 })

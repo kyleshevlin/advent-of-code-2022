@@ -19,24 +19,32 @@ const data = getData(__dirname)
  * text fast enough. Pass it in as an arg to the solution so I can use a different
  * set of indices in the tests.
  */
-const CRATE_INDEXES = [1, 5, 9, 13, 17, 21, 25, 29, 33]
 
-function formatInput(input, crateIndexes) {
+function formatInput(input) {
   let [stacks, moves] = input.split('\n\n')
 
-  const stacksInRows = stacks.split('\n').reverse().slice(1)
+  // Take the stack rows, reverse them (so we can push items in order) and
+  // get rid of the line of numbers
+  stacks = stacks.split('\n').reverse().slice(1)
 
-  const stacksActual = Array(crateIndexes.length)
+  // Determine how many stacks you will need
+  const cratesInARow = Math.ceil(stacks[0].length / 4)
+
+  const stacksActual = Array(cratesInARow)
     .fill()
     .map(() => createStack())
 
-  for (const row of stacksInRows) {
-    for (const [stackIdx, crateIdx] of crateIndexes.entries()) {
-      const value = row[crateIdx] ?? ''
+  for (const row of stacks) {
+    let stackIdx = 0
 
-      if (value.trim()) {
+    for (let crateIdx = 1; crateIdx < row.length - 4; crateIdx += 4) {
+      const value = row[crateIdx].trim()
+
+      if (value) {
         stacksActual[stackIdx].push(value)
       }
+
+      stackIdx++
     }
   }
 
@@ -59,8 +67,8 @@ function parseMove(str) {
   return { quantity, from, to }
 }
 
-function solution1(input, crateIndexes = CRATE_INDEXES) {
-  const { stacks, moves } = formatInput(input, crateIndexes)
+function solution1(input) {
+  const { stacks, moves } = formatInput(input)
 
   for (const move of moves) {
     const { quantity, from, to } = move
@@ -81,8 +89,8 @@ function solution1(input, crateIndexes = CRATE_INDEXES) {
 const firstAnswer = solution1(data)
 // console.log(firstAnswer) // TPGVQPFDH
 
-function solution2(input, crateIndexes = CRATE_INDEXES) {
-  const { stacks, moves } = formatInput(input, crateIndexes)
+function solution2(input) {
+  const { stacks, moves } = formatInput(input)
 
   for (const move of moves) {
     const { quantity, from, to } = move
