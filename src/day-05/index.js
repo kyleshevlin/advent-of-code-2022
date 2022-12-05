@@ -1,4 +1,4 @@
-const { createStack, createQueue, getData } = require('../utils')
+const { createStack, getData } = require('../utils')
 
 const data = getData(__dirname)
 
