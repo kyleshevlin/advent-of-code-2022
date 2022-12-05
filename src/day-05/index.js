@@ -14,12 +14,6 @@ const { createStack, getData } = require('../utils')
 
 const data = getData(__dirname)
 
-/**
- * Did this hard coded because I couldn't come up with a way to parse the actual
- * text fast enough. Pass it in as an arg to the solution so I can use a different
- * set of indices in the tests.
- */
-
 function formatInput(input) {
   let [stacks, moves] = input.split('\n\n')
 
