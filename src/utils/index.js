@@ -142,6 +142,37 @@ const spread = fn => array => fn(...array)
  */
 const trace = msg => x => (console.log(msg, x), x)
 
+/**
+ * Matrix helpers
+ */
+
+function transpose(matrix) {
+  const result = matrix.map(row => [...row])
+
+  for (let i = 0; i < result.length; i++) {
+    for (let j = 0; j < i; j++) {
+      const tmp = result[i][j]
+
+      result[i][j] = result[j][i]
+      result[j][i] = tmp
+    }
+  }
+
+  return result
+}
+
+function reverseRows(matrix) {
+  return matrix.map(row => [...row].reverse())
+}
+
+function rotateClockwise(matrix) {
+  return reverseRows(transpose(matrix))
+}
+
+function rotateCounterClockwise(matrix) {
+  return transpose(reverseRows(matrix))
+}
+
 module.exports = {
   add,
   createQueue,
@@ -157,6 +188,8 @@ module.exports = {
   product,
   quotient,
   reduce,
+  rotateClockwise,
+  rotateCounterClockwise,
   spread,
   subtract,
   sum,
