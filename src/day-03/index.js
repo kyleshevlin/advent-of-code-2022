@@ -11,7 +11,15 @@
  * values.
  */
 
-const { add, getData, intersection, map, pipe, reduce } = require('../utils')
+const {
+  add,
+  getData,
+  intersection,
+  map,
+  pipe,
+  reduce,
+  spread,
+} = require('../utils')
 
 const data = getData(__dirname)
 
@@ -44,7 +52,7 @@ function getPriority(item) {
 function solution1(input) {
   return getRucksacks(input)
     .map(splitRucksack)
-    .map(compartments => findSharedItem(...compartments))
+    .map(spread(findSharedItem))
     .map(getPriority)
     .reduce(add, 0)
 }
@@ -72,7 +80,7 @@ function solution2(input) {
   return pipe(
     getRucksacks,
     getGroups,
-    map(group => findSharedItem(...group)),
+    map(spread(findSharedItem)),
     map(getPriority),
     reduce(add, 0)
   )(input)

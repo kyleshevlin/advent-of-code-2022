@@ -12,7 +12,7 @@
  * intersection of those two sets, then we know we have overlap.
  */
 
-const { getData, intersection, createRange } = require('../utils')
+const { getData, intersection, createRange, spread } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -49,9 +49,7 @@ function checkOverlap(a, b) {
 }
 
 function solution2(input) {
-  return getPairs(input)
-    .map(([a, b]) => checkOverlap(a, b))
-    .filter(Boolean).length
+  return getPairs(input).map(spread(checkOverlap)).filter(Boolean).length
 }
 
 const secondAnswer = solution2(data)

@@ -127,6 +127,8 @@ const map = fn => array => array.map(fn)
 const reduce = (reducer, initialArg) => array =>
   array.reduce(reducer, initialArg)
 
+const spread = fn => array => fn(...array)
+
 /**
  * Use this with map to log out the current value next to the message while
  * still returning the value to keep your composition working. Example:
@@ -155,6 +157,7 @@ module.exports = {
   product,
   quotient,
   reduce,
+  spread,
   subtract,
   sum,
   trace,
