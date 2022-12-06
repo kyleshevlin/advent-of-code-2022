@@ -14,7 +14,7 @@ const { getData } = require('../utils')
 
 const data = getData(__dirname)
 
-function indexOfFirstSetAllUniqueCharacters(input, size) {
+function getIndexOfFirstUniqueCharacterSequence(input, size) {
   let i
   for (i = size; i < input.length - 1; i++) {
     const chars = input.substring(i - size, i).split('')
@@ -27,14 +27,14 @@ function indexOfFirstSetAllUniqueCharacters(input, size) {
 }
 
 function solution1(input) {
-  return indexOfFirstSetAllUniqueCharacters(input, 4)
+  return getIndexOfFirstUniqueCharacterSequence(input, 4)
 }
 
 const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 1702
 
 function solution2(input) {
-  return indexOfFirstSetAllUniqueCharacters(input, 14)
+  return getIndexOfFirstUniqueCharacterSequence(input, 14)
 }
 
 const secondAnswer = solution2(data)
