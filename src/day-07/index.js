@@ -1,4 +1,4 @@
-const { createTree, getData, add, traverse } = require('../utils')
+const { add, createTree, getData, traverse } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -15,18 +15,19 @@ function parseInputIntoTree(input) {
         isListing = false
         const arg = line.substring(5)
 
-        if (arg === '/') {
-          currentNode = tree.rootNode
-          continue
+        switch (arg) {
+          case '/':
+            currentNode = tree.rootNode
+            break
+
+          case '..':
+            currentNode = currentNode.parentNode
+            break
+
+          default:
+            currentNode = currentNode.findChild(arg)
         }
 
-        if (arg === '..') {
-          currentNode = currentNode.parentNode
-          continue
-        }
-
-        const node = currentNode.findChild(arg)
-        currentNode = node
         continue
       }
 
@@ -38,15 +39,18 @@ function parseInputIntoTree(input) {
       if (isListing) {
         const [meta, key] = line.split(' ')
 
-        if (meta === 'dir') {
-          currentNode.addChild(key, { type: 'dir' })
-          continue
+        switch (meta) {
+          case 'dir':
+            currentNode.addChild(key, { type: 'dir' })
+            break
+
+          default:
+            currentNode.addChild(key, {
+              type: 'file',
+              size: Number(meta),
+            })
         }
 
-        currentNode.addChild(key, {
-          type: 'file',
-          size: Number(meta),
-        })
         continue
       }
 
@@ -77,16 +81,22 @@ function getTotalSize(node) {
   return result
 }
 
-function solution1(input) {
-  const tree = parseInputIntoTree(input)
+function useSizes() {
   const sizes = {}
 
   const visitor = node => {
     if (node.meta.type === 'dir') {
-      sizes[`${node.key}-${node.parentNode?.key ?? 'root'}`] =
-        getTotalSize(node)
+      const sizeKey = `${node.key}-${node.parentNode?.key ?? 'root'}`
+      sizes[sizeKey] = getTotalSize(node)
     }
   }
+
+  return { sizes, visitor }
+}
+
+function solution1(input) {
+  const tree = parseInputIntoTree(input)
+  const { sizes, visitor } = useSizes()
 
   traverse(tree.rootNode, visitor)
 
@@ -100,19 +110,12 @@ function solution1(input) {
 // const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 1642503
 
+const TOTAL_DISK_SPACE = 70000000
+const SPACE_FOR_UPDATE = 30000000
+
 function solution2(input) {
-  const TOTAL_DISK_SPACE = 70000000
-  const SPACE_FOR_UPDATE = 30000000
-
   const tree = parseInputIntoTree(input)
-  const sizes = {}
-
-  const visitor = node => {
-    if (node.meta.type === 'dir') {
-      sizes[`${node.key}-${node.parentNode?.key ?? 'root'}`] =
-        getTotalSize(node)
-    }
-  }
+  const { sizes, visitor } = useSizes()
 
   traverse(tree.rootNode, visitor)
 
@@ -130,7 +133,6 @@ const secondAnswer = solution2(data)
 // console.log(secondAnswer) // 6999588
 
 module.exports = {
-  parseInputIntoTree,
   solution1,
   solution2,
 }
