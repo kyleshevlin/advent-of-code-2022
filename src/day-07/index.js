@@ -1,3 +1,27 @@
+/**
+ * Day 7 involved a file system. This means trees and recursion!
+ *
+ * A tree is a graph data structure where a `node` can have many `children`, but
+ * only a single `parentNode`. Check out the `utils` folder for how I implemented
+ * a tree data structure.
+ *
+ * When "walking" a tree, we use recursion, because a tree is itself a recursive
+ * structure. The `traverse` function (also in `utils`) shows this. We pass it
+ * a visiting function and call it as we visit each node, and then do the same
+ * for its children, on and on and on.
+ *
+ * One of the keys to this puzzle is _literally_ the keys, that is the name of
+ * the directories. When calculating sizes, be careful if you try to store them
+ * in a flat data structure, such as an object map, like I did. If two different
+ * directories have the same key, you'll get incorrect results.
+ *
+ * We parse the program line by line. If it's a `cd` command, we manage the
+ * `currentNode` (aka current directory). If it's `ls`, we enter an `isListing`
+ * state until we change directory. While we are listing, we parse each line and
+ * add the child to the `currentNode` with the appropriate `meta` information to
+ * use later when getting the total size.
+ */
+
 const { add, createTree, getData, traverse } = require('../utils')
 
 const data = getData(__dirname)
@@ -86,7 +110,8 @@ function useSizes() {
 
   const visitor = node => {
     if (node.meta.type === 'dir') {
-      const sizeKey = `${node.key}-${node.parentNode?.key ?? 'root'}`
+      // performance.now() suffices as a hash to make each key unique
+      const sizeKey = `${node.key}-${performance.now()}}`
       sizes[sizeKey] = getTotalSize(node)
     }
   }
@@ -119,7 +144,7 @@ function solution2(input) {
 
   traverse(tree.rootNode, visitor)
 
-  const totalSize = sizes['/-root']
+  const totalSize = Object.values(sizes)[0]
   const minimalDeletionSize = SPACE_FOR_UPDATE - (TOTAL_DISK_SPACE - totalSize)
 
   const result = Math.min(
