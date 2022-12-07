@@ -65,6 +65,55 @@ function createRange(from, to) {
   return result
 }
 
+function traverse(node, visitFn, depth = 0) {
+  visitFn(node, depth)
+
+  node.children.forEach(child => traverse(child, visitFn, depth + 1))
+}
+
+function createTreeNode(key, meta, parentNode = null) {
+  const children = []
+
+  const node = {
+    key,
+    children,
+    meta,
+    parentNode,
+    addChild(childKey, childMeta) {
+      const childNode = createTreeNode(childKey, childMeta, node)
+      children.push(childNode)
+    },
+    findChild(childKey) {
+      return node.children.find(child => child.key === childKey)
+    },
+  }
+
+  return node
+}
+
+function createTree(rootKey, meta) {
+  const rootNode = createTreeNode(rootKey, meta)
+
+  return {
+    rootNode,
+    print() {
+      let result = ''
+
+      function addKeyToResult(node, depth) {
+        const text = `${node.key} ${JSON.stringify(node.meta)}`
+        result +=
+          result.length === 0 ? text : `\n${' '.repeat(depth * 2)}${text}`
+      }
+
+      traverse(rootNode, addKeyToResult)
+
+      console.log(result)
+
+      return result
+    },
+  }
+}
+
 /**
  * Math helpers
  */
@@ -178,6 +227,7 @@ module.exports = {
   createQueue,
   createRange,
   createStack,
+  createTree,
   difference,
   divide,
   getData,
@@ -194,5 +244,6 @@ module.exports = {
   subtract,
   sum,
   trace,
+  traverse,
   union,
 }
