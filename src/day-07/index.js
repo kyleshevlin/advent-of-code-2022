@@ -90,8 +90,6 @@ function solution1(input) {
 
   traverse(tree.rootNode, visitor)
 
-  console.log(sizes)
-
   const result = Object.values(sizes)
     .filter(value => value <= 100000)
     .reduce(add, 0)
@@ -99,13 +97,37 @@ function solution1(input) {
   return result
 }
 
-const firstAnswer = solution1(data)
-console.log(firstAnswer)
+// const firstAnswer = solution1(data)
+// console.log(firstAnswer) // 1642503
 
-function solution2(input) {}
+function solution2(input) {
+  const TOTAL_DISK_SPACE = 70000000
+  const SPACE_FOR_UPDATE = 30000000
 
-// const secondAnswer = solution2(data)
-// console.log(secondAnswer)
+  const tree = parseInputIntoTree(input)
+  const sizes = {}
+
+  const visitor = node => {
+    if (node.meta.type === 'dir') {
+      sizes[`${node.key}-${node.parentNode?.key ?? 'root'}`] =
+        getTotalSize(node)
+    }
+  }
+
+  traverse(tree.rootNode, visitor)
+
+  const totalSize = sizes['/-root']
+  const minimalDeletionSize = SPACE_FOR_UPDATE - (TOTAL_DISK_SPACE - totalSize)
+
+  const result = Math.min(
+    ...Object.values(sizes).filter(value => value >= minimalDeletionSize)
+  )
+
+  return result
+}
+
+const secondAnswer = solution2(data)
+// console.log(secondAnswer) // 6999588
 
 module.exports = {
   parseInputIntoTree,
