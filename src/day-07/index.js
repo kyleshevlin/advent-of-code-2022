@@ -107,7 +107,7 @@ function solution1(input) {
   return result
 }
 
-// const firstAnswer = solution1(data)
+const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 1642503
 
 const TOTAL_DISK_SPACE = 70000000
