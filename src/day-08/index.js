@@ -9,22 +9,26 @@ function makeGrid(input) {
     .map(row => row.split('').map(Number))
 }
 
-function isTreeVisible(height, rowIdx, colIdx, grid) {
+function isTreeVisible(rowIdx, colIdx, grid) {
+  const currentTree = grid[rowIdx][colIdx]
+
+  const isEveryTreeShorter = trees => trees.every(tree => tree < currentTree)
+
   // left
   const treesToTheLeft = grid[rowIdx].slice(0, colIdx)
-  const visibleFromLeft = treesToTheLeft.every(tree => tree < height)
+  const visibleFromLeft = isEveryTreeShorter(treesToTheLeft)
 
   // right
   const treesToTheRight = grid[rowIdx].slice(colIdx + 1)
-  const visibleFromRight = treesToTheRight.every(tree => tree < height)
+  const visibleFromRight = isEveryTreeShorter(treesToTheRight)
 
   // up
   const treesToTheTop = grid.slice(0, rowIdx).map(row => row[colIdx])
-  const visibleFromTop = treesToTheTop.every(tree => tree < height)
+  const visibleFromTop = isEveryTreeShorter(treesToTheTop)
 
   // down
   const treesToTheBottom = grid.slice(rowIdx + 1).map(row => row[colIdx])
-  const visibleFromBottom = treesToTheBottom.every(tree => tree < height)
+  const visibleFromBottom = isEveryTreeShorter(treesToTheBottom)
 
   return (
     visibleFromLeft || visibleFromRight || visibleFromTop || visibleFromBottom
@@ -35,11 +39,9 @@ function solution1(input) {
   const grid = makeGrid(input)
   let visibleCount = 0
 
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[0].length; j++) {
-      const tree = grid[i][j]
-
-      if (isTreeVisible(tree, i, j, grid)) {
+  for (let rowIdx = 0; rowIdx < grid.length; rowIdx++) {
+    for (let colIdx = 0; colIdx < grid[0].length; colIdx++) {
+      if (isTreeVisible(rowIdx, colIdx, grid)) {
         visibleCount++
       }
     }
@@ -51,45 +53,39 @@ function solution1(input) {
 const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 1849
 
-function getScenicScoreForTree(height, rowIdx, colIdx, grid) {
+function getScenicScoreForTree(rowIdx, colIdx, grid) {
+  const currentTree = grid[rowIdx][colIdx]
+
+  const getVisibleTreeCount = trees => {
+    let result = 0
+
+    for (const tree of trees) {
+      result++
+      if (tree < currentTree) continue
+      if (tree >= currentTree) break
+    }
+
+    return result
+  }
+
   // left
   const treesToTheLeft = grid[rowIdx].slice(0, colIdx).reverse()
-  let leftCount = 0
-  for (const tree of treesToTheLeft) {
-    leftCount++
-    if (tree < height) continue
-    if (tree >= height) break
-  }
+  const leftCount = getVisibleTreeCount(treesToTheLeft)
 
   // right
   const treesToTheRight = grid[rowIdx].slice(colIdx + 1)
-  let rightCount = 0
-  for (const tree of treesToTheRight) {
-    rightCount++
-    if (tree < height) continue
-    if (tree >= height) break
-  }
+  const rightCount = getVisibleTreeCount(treesToTheRight)
 
   // up
   const treesToTheTop = grid
     .slice(0, rowIdx)
     .map(row => row[colIdx])
     .reverse()
-  let topCount = 0
-  for (const tree of treesToTheTop) {
-    topCount++
-    if (tree < height) continue
-    if (tree >= height) break
-  }
+  const topCount = getVisibleTreeCount(treesToTheTop)
 
   // down
   const treesToTheBottom = grid.slice(rowIdx + 1).map(row => row[colIdx])
-  let bottomCount = 0
-  for (const tree of treesToTheBottom) {
-    bottomCount++
-    if (tree < height) continue
-    if (tree >= height) break
-  }
+  const bottomCount = getVisibleTreeCount(treesToTheBottom)
 
   const result = leftCount * rightCount * topCount * bottomCount
 
@@ -99,7 +95,7 @@ function getScenicScoreForTree(height, rowIdx, colIdx, grid) {
 function solution2(input) {
   const grid = makeGrid(input)
   const scores = grid.map((row, rowIdx) =>
-    row.map((tree, colIdx) => getScenicScoreForTree(tree, rowIdx, colIdx, grid))
+    row.map((_, colIdx) => getScenicScoreForTree(rowIdx, colIdx, grid))
   )
 
   return Math.max(...scores.flat())
