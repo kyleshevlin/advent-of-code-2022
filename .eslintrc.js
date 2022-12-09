@@ -13,5 +13,6 @@ module.exports = {
   plugins: ['jest'],
   rules: {
     'no-unused-vars': 'off',
+    'prefer-const': 'warn',
   },
 }

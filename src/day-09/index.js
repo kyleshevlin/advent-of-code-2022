@@ -52,7 +52,7 @@ const SEPARATOR = `~~~`
 function simulateRope() {
   let headPos = [0, 0]
   let tailPos = [0, 0]
-  let tailLocations = new Set([tailPos.join(SEPARATOR)])
+  const tailLocations = new Set([tailPos.join(SEPARATOR)])
 
   return {
     getState: () => {
@@ -86,7 +86,7 @@ function solution1(input) {
 
 function simulateLongRope() {
   const knotPositions = Array(10).fill([0, 0])
-  let tailLocations = new Set([knotPositions.at(-1).join(SEPARATOR)])
+  const tailLocations = new Set([knotPositions.at(-1).join(SEPARATOR)])
 
   return {
     getState: () => {
