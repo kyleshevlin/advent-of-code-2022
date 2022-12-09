@@ -18,9 +18,9 @@ function getNextHeadPosition(headPos, movement) {
 
   switch (direction) {
     case 'U':
-      return [x, y - amount]
-    case 'D':
       return [x, y + amount]
+    case 'D':
+      return [x, y - amount]
     case 'L':
       return [x - amount, y]
     case 'R':
@@ -28,46 +28,22 @@ function getNextHeadPosition(headPos, movement) {
   }
 }
 
-function getNextTrailingKnotsPosition(tailPos, headPos) {
-  const [tx, ty] = tailPos
-  const [hx, hy] = headPos
+function getNextTrailingKnotsPosition(trailPos, leadPos) {
+  const [tx, ty] = trailPos
+  const [lx, ly] = leadPos
 
-  const xDiff = hx - tx
-  const yDiff = hy - ty
+  const xDiff = lx - tx
+  const yDiff = ly - ty
 
   // touching, don't need to move
   if (Math.abs(xDiff) <= 1 && Math.abs(yDiff) <= 1) return [tx, ty]
 
-  // 2 left
-  if (hy === ty && tx === hx - 2) {
-    return [tx + 1, ty]
-  }
+  const getRoundingMethod = num => (num <= 0 ? 'floor' : 'ceil')
 
-  // 2 right
-  if (hy === ty && tx === hx + 2) {
-    return [tx - 1, ty]
-  }
+  const nextTx = tx + Math[getRoundingMethod(xDiff)](xDiff / 2)
+  const nextTy = ty + Math[getRoundingMethod(yDiff)](yDiff / 2)
 
-  // 2 up
-  if (hx === tx && ty === hy - 2) {
-    return [tx, ty + 1]
-  }
-
-  // 2 down
-  if (hx === tx && ty === hy + 2) {
-    return [tx, ty - 1]
-  }
-
-  if (hx !== tx && hy !== ty) {
-    const getMethod = num => (num < 0 ? 'floor' : 'ceil')
-
-    const nextTx = tx + Math[getMethod(xDiff)](xDiff / 2)
-    const nextTy = ty + Math[getMethod(yDiff)](yDiff / 2)
-
-    return [nextTx, nextTy]
-  }
-
-  console.log('missed', tailPos, headPos)
+  return [nextTx, nextTy]
 }
 
 const SEPARATOR = `~~~`
@@ -76,14 +52,12 @@ function simulateRope() {
   let headPos = [0, 0]
   let tailPos = [0, 0]
   let tailLocations = new Set([tailPos.join(SEPARATOR)])
-  let tickCount = 0
 
   return {
     getState: () => {
-      return { headPos, tailPos, tailLocations, tickCount }
+      return { headPos, tailPos, tailLocations }
     },
     tick(movement) {
-      tickCount++
       const [direction, amount] = movement
 
       for (let i = 0; i < amount; i++) {
@@ -111,9 +85,7 @@ function solution1(input) {
 
 function simulateLongRope() {
   const knotPositions = Array(10).fill([0, 0])
-  let tailLocations = new Set([
-    knotPositions[knotPositions.length - 1].join(SEPARATOR),
-  ])
+  let tailLocations = new Set([knotPositions.at(-1).join(SEPARATOR)])
 
   return {
     getState: () => {
