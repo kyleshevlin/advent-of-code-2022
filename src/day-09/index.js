@@ -36,13 +36,24 @@ function getNextTrailingKnotsPosition(trailPos, leadPos) {
   const yDiff = ly - ty
 
   // touching, don't need to move
-  if (Math.abs(xDiff) <= 1 && Math.abs(yDiff) <= 1) return [tx, ty]
+  if (Math.abs(xDiff) <= 1 && Math.abs(yDiff) <= 1) return trailPos
 
-  // This helper function rounds .5 and -.5 to 1 and -1 respectively
-  const getRoundingFn = num => (num <= 0 ? Math.floor : Math.ceil)
-
-  const nextTx = tx + getRoundingFn(xDiff)(xDiff / 2)
-  const nextTy = ty + getRoundingFn(yDiff)(yDiff / 2)
+  /**
+   * Let me explain how this works. The trailing knot can always be thought of as
+   * following the leading knot _in both dimensions_. It just so happens that
+   * sometimes the change in a dimension is 0. Such as when it follows up, down,
+   * left, and right.
+   *
+   * In a diagonal change, we'll get change in both dimensions, and it so happens
+   * that it'll always be a movement of either 1 or -1. There's a clever way to
+   * get this value: `Math.sign()`. `Math.sign()` returns 1 for n > 0, -1 for
+   * n < 0, and 0 or -0 when n is 0 or -0. This is perfect.
+   *
+   * If there's no change in a dimension, it returns 0, otherwise it returns the
+   * amount of change in that dimension
+   */
+  const nextTx = tx + Math.sign(xDiff)
+  const nextTy = ty + Math.sign(yDiff)
 
   return [nextTx, nextTy]
 }
