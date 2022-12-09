@@ -38,10 +38,10 @@ function getNextTrailingKnotsPosition(trailPos, leadPos) {
   // touching, don't need to move
   if (Math.abs(xDiff) <= 1 && Math.abs(yDiff) <= 1) return [tx, ty]
 
-  const getRoundingMethod = num => (num <= 0 ? 'floor' : 'ceil')
+  const getRoundingFn = num => (num <= 0 ? Math.floor : Math.ceil)
 
-  const nextTx = tx + Math[getRoundingMethod(xDiff)](xDiff / 2)
-  const nextTy = ty + Math[getRoundingMethod(yDiff)](yDiff / 2)
+  const nextTx = tx + getRoundingFn(xDiff)(xDiff / 2)
+  const nextTy = ty + getRoundingFn(yDiff)(yDiff / 2)
 
   return [nextTx, nextTy]
 }
