@@ -27,5 +27,6 @@ U 20
 `
 
 test('solution2', () => {
+  expect(solution2(input)).toEqual(1)
   expect(solution2(input2)).toEqual(36)
 })

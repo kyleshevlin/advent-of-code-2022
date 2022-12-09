@@ -49,43 +49,8 @@ function getNextTrailingKnotsPosition(trailPos, leadPos) {
 
 const SEPARATOR = `~~~`
 
-function simulateRope() {
-  let headPos = [0, 0]
-  let tailPos = [0, 0]
-  const tailLocations = new Set([tailPos.join(SEPARATOR)])
-
-  return {
-    getState: () => {
-      return { headPos, tailPos, tailLocations }
-    },
-    tick(movement) {
-      const [direction, amount] = movement
-
-      for (let i = 0; i < amount; i++) {
-        headPos = getNextHeadPosition(headPos, [direction, 1])
-        tailPos = getNextTrailingKnotsPosition(tailPos, headPos)
-        tailLocations.add(tailPos.join(SEPARATOR))
-      }
-    },
-  }
-}
-
-function solution1(input) {
-  const movements = getHeadMovements(input)
-  const sim = simulateRope()
-
-  for (const move of movements) {
-    sim.tick(move)
-  }
-
-  return sim.getState().tailLocations.size
-}
-
-// const firstAnswer = solution1(data)
-// console.log(firstAnswer) // 5710
-
-function simulateLongRope() {
-  const knotPositions = Array(10).fill([0, 0])
+function simulateRope(knots) {
+  const knotPositions = Array(knots).fill([0, 0])
   const tailLocations = new Set([knotPositions.at(-1).join(SEPARATOR)])
 
   return {
@@ -114,9 +79,23 @@ function simulateLongRope() {
   }
 }
 
+function solution1(input) {
+  const movements = getHeadMovements(input)
+  const sim = simulateRope(2)
+
+  for (const move of movements) {
+    sim.tick(move)
+  }
+
+  return sim.getState().tailLocations.size
+}
+
+// const firstAnswer = solution1(data)
+// console.log(firstAnswer) // 5710
+
 function solution2(input) {
   const movements = getHeadMovements(input)
-  const sim = simulateLongRope()
+  const sim = simulateRope(10)
 
   for (const move of movements) {
     sim.tick(move)
