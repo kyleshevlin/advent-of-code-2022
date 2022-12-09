@@ -98,17 +98,16 @@ function simulateLongRope() {
         for (const [index, knot] of knotPositions.entries()) {
           if (index === 0) {
             knotPositions[index] = getNextHeadPosition(knot, [direction, 1])
-          } else {
-            knotPositions[index] = getNextTrailingKnotsPosition(
-              knot,
-              knotPositions[index - 1]
-            )
+            continue
           }
 
-          if (index === knotPositions.length - 1) {
-            tailLocations.add(knotPositions[index].join(SEPARATOR))
-          }
+          knotPositions[index] = getNextTrailingKnotsPosition(
+            knot,
+            knotPositions[index - 1]
+          )
         }
+
+        tailLocations.add(knotPositions.at(-1).join(SEPARATOR))
       }
     },
   }
