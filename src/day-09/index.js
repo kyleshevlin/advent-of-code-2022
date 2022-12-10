@@ -1,3 +1,20 @@
+/**
+ * Day 9 involves calculating the location of knots on a rope. I chose to use
+ * a simulation pattern for this. That is, we hold some state in closure, and
+ * give ourselves a `tick` method to advance the state.
+ *
+ * We're given a list of the movements of the head knot of the rope, and have
+ * to track all positions the tail knot ends up in. So we parse the moves and
+ * feed them as an argument to each `tick`.
+ *
+ * The movement of a trailing knot turned out to be much simpler than my original
+ * approach. At first, I imperatively wrote out updates for all linear directions:
+ * up, down, left, right. That worked, and then I handled diagonals somewhat similar
+ * to what you see here (you can go thru the git history if you care). Then, I
+ * realized that the logic for handling diagonal movement, handled linear movement,
+ * too. This simplified the code greatly. Really happy with figuring that out.
+ */
+
 const { getData } = require('../utils')
 
 const data = getData(__dirname)

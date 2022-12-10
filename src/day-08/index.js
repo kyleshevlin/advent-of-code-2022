@@ -1,3 +1,20 @@
+/**
+ * Day 8 involved building a tree house in a forest. Our input is a grid of the
+ * height of those trees.
+ *
+ * In Part 1, we needed to determine if a tree was visible from outside the forest.
+ * To do this, we get every tree between our current tree and the edge of the forest
+ * and check if its shorter. `every` is super helpful here because calling `every`
+ * on an empty array returns `true`. Because of this, we don't need to do anything
+ * special when we are on the edge of the forest (like have a guard check for
+ * whether a tree exists).
+ *
+ * In Part 2, we check in every direction for how many trees we could see from
+ * that particular tree. This is _slightly_ different in that the order we
+ * iterate over the trees matter. Note the use of `reverse` in two directions
+ * to make this simple.
+ */
+
 const { getData } = require('../utils')
 
 const data = getData(__dirname)
