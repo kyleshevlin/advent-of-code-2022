@@ -13,11 +13,12 @@ function createSimulation() {
 
   const cycle = () => {
     const cycleIdx = cycles.length % 40
+
     cycles.push(value)
 
     const diff = value - cycleIdx
-
     const char = Math.abs(diff) <= 1 ? '#' : '.'
+
     pixels.push(char)
   }
 
