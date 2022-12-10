@@ -42,18 +42,7 @@ function createSimulation() {
   }
 }
 
-const INDEXES = [20, 60, 100, 140, 180, 220]
-
-function renderPixels(pixels) {
-  return `
-${pixels.slice(0, 40).join('')}
-${pixels.slice(40, 80).join('')}
-${pixels.slice(80, 120).join('')}
-${pixels.slice(120, 160).join('')}
-${pixels.slice(160, 200).join('')}
-${pixels.slice(200).join('')}
-`.trim()
-}
+const CYCLE_INDEXES = [20, 60, 100, 140, 180, 220]
 
 function solution1(input) {
   const lines = parseInput(input)
@@ -66,7 +55,7 @@ function solution1(input) {
   const { cycles } = sim.getState()
 
   let result = 0
-  for (const idx of INDEXES) {
+  for (const idx of CYCLE_INDEXES) {
     result += idx * cycles[idx - 1]
   }
 
@@ -75,6 +64,17 @@ function solution1(input) {
 
 // const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 14860
+
+function renderPixels(pixels) {
+  return `
+${pixels.slice(0, 40).join('')}
+${pixels.slice(40, 80).join('')}
+${pixels.slice(80, 120).join('')}
+${pixels.slice(120, 160).join('')}
+${pixels.slice(160, 200).join('')}
+${pixels.slice(200).join('')}
+`.trim()
+}
 
 function solution2(input) {
   const lines = parseInput(input)
