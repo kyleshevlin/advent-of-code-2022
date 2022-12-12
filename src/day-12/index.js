@@ -22,18 +22,21 @@ function createNode(key, meta) {
   }
 }
 
+/**
+ * This is a modified graph structure, we don't actually use the edges.
+ *
+ * TODO: move into utils
+ */
 function createGraph() {
   const nodes = []
-  const edges = []
 
   const byKey = key => node => key === node.key
 
   return {
     nodes,
-    edges,
 
     addNode(key, meta) {
-      let node = this.findNode(byKey(key))
+      let node = nodes.find(byKey(key))
 
       if (node) return node
 
@@ -42,19 +45,13 @@ function createGraph() {
       return node
     },
 
-    findNode(predicate) {
-      return nodes.find(predicate)
-    },
-
     addEdge(node1Key, node2Key) {
-      const node1 = this.findNode(byKey(node1Key))
-      const node2 = this.findNode(byKey(node2Key))
+      const node1 = nodes.find(byKey(node1Key))
+      const node2 = nodes.find(byKey(node2Key))
 
       if (!(node1 && node2)) return
 
       node1.addChild(node2)
-
-      edges.push(`${node1Key}=>${node2Key}`)
     },
   }
 }
@@ -64,10 +61,12 @@ const CHARACTER_ORDER = 'SabcdefghijklmnopqrstuvwxyzE'.split('')
 function gridToGraph(grid) {
   const graph = createGraph()
 
+  // Helper for mapping characters to numeric values
   function getCharValue(char) {
     return CHARACTER_ORDER.findIndex(x => x === char)
   }
 
+  // Helper for creating node meta data
   function getNodeMeta(char) {
     return {
       char,
@@ -77,6 +76,8 @@ function gridToGraph(grid) {
     }
   }
 
+  // Safely try to get a neighbor item, doesn't break on items outside of the
+  // range of the arrays
   function safeGridGet(rowIdx, colIdx) {
     try {
       return grid[rowIdx][colIdx]
@@ -106,16 +107,22 @@ function gridToGraph(grid) {
 
       const neighborIndexes = getNeighborIndices(rowIdx, colIdx)
 
-      for (const [_rowIdx, _colIdx] of neighborIndexes) {
-        const neighbor = safeGridGet(_rowIdx, _colIdx)
+      for (const [neighborRowIdx, neighborColIdx] of neighborIndexes) {
+        const neighborChar = safeGridGet(neighborRowIdx, neighborColIdx)
 
-        if (neighbor && getCharValue(neighbor) <= charValue + 1) {
-          const neighborKey = getNodeKey(_rowIdx, _colIdx)
+        if (!neighborChar) continue
 
-          const neighborNode = graph.addNode(neighborKey, getNodeMeta(neighbor))
+        const neighborValue = getCharValue(neighborChar)
+
+        if (neighborValue <= charValue + 1) {
+          const neighborKey = getNodeKey(neighborRowIdx, neighborColIdx)
+
+          const neighborNode = graph.addNode(
+            neighborKey,
+            getNodeMeta(neighborChar)
+          )
 
           node.addChild(neighborNode)
-          graph.addEdge(node.key, neighborNode.key)
         }
       }
     }
@@ -160,8 +167,8 @@ function solution1(input) {
   const grid = parseInput(input)
   const graph = gridToGraph(grid)
 
-  const startNode = graph.findNode(node => node.meta.start)
-  const endNode = graph.findNode(node => node.meta.end)
+  const startNode = graph.nodes.find(node => node.meta.start)
+  const endNode = graph.nodes.find(node => node.meta.end)
   const result = djikstras(graph, startNode, endNode)
 
   return result
@@ -171,19 +178,20 @@ function solution1(input) {
 // console.log(firstAnswer) // 408
 
 function solution2(input) {
+  /**
+   * Modify the grid so that the Start node is just a normal lowest level node
+   */
   const grid = parseInput(input).map(row =>
     row.map(char => (char === 'S' ? 'a' : char))
   )
   const graph = gridToGraph(grid)
 
   const startNodes = graph.nodes.filter(node => node.meta.char === 'a')
-  const endNode = graph.findNode(node => node.meta.end)
+  const endNode = graph.nodes.find(node => node.meta.end)
 
-  const results = []
-
-  for (const node of startNodes) {
-    results.push(djikstras(graph, node, endNode))
-  }
+  const results = startNodes.map(startNode =>
+    djikstras(graph, startNode, endNode)
+  )
 
   return Math.min(...results)
 }
