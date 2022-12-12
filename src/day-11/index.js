@@ -116,7 +116,7 @@ function createSimulationTwo(input) {
    * I don't think it's too far off from my idea of we don't need to store the full
    * worry, just a worry that results in the same value somehow.
    */
-  const lowestCommonDenominator = product(monkeys.map(monkey => monkey.test))
+  const lowestCommonMultiple = product(monkeys.map(monkey => monkey.test))
 
   return {
     getState: () => ({
@@ -135,7 +135,7 @@ function createSimulationTwo(input) {
           const amount = y === 'old' ? worry : Number(y)
           worry = OP_TO_FN[op](worry, amount)
 
-          worry %= lowestCommonDenominator
+          worry %= lowestCommonMultiple
 
           const testResult = Boolean(worry % test === 0)
           const monkeyIndex = testResult ? ifTrue : ifFalse
