@@ -1,4 +1,4 @@
-const { createRange, getData } = require('../utils')
+const { createRange, getData, safeGridGet } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -103,14 +103,6 @@ function createSimulation(rocks, dimensions) {
 
   let isComplete = false
 
-  const safeGridGet = (y, x) => {
-    try {
-      return withRocks[y][x]
-    } catch (err) {
-      return undefined
-    }
-  }
-
   return {
     getState() {
       return {
@@ -130,9 +122,10 @@ function createSimulation(rocks, dimensions) {
 
       while (falling) {
         const [x, y] = sand
-        const down = safeGridGet(y + 1, x)
-        const downLeft = safeGridGet(y + 1, x - 1)
-        const downRight = safeGridGet(y + 1, x + 1)
+        const nextY = y + 1
+        const down = safeGridGet(withRocks, nextY, x)
+        const downLeft = safeGridGet(withRocks, nextY, x - 1)
+        const downRight = safeGridGet(withRocks, nextY, x + 1)
 
         if ([down, downLeft, downRight].includes(undefined)) {
           isComplete = true
@@ -141,17 +134,17 @@ function createSimulation(rocks, dimensions) {
         }
 
         if (down === AIR) {
-          sand = [x, y + 1]
+          sand = [x, nextY]
           continue
         }
 
         if (downLeft === AIR) {
-          sand = [x - 1, y + 1]
+          sand = [x - 1, nextY]
           continue
         }
 
         if (downRight === AIR) {
-          sand = [x + 1, y + 1]
+          sand = [x + 1, nextY]
           continue
         }
 

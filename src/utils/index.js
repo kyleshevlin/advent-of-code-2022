@@ -273,6 +273,8 @@ function rotateCounterClockwise(matrix) {
   return transpose(reverseRows(matrix))
 }
 
+const safeGridGet = (grid, rowIdx, colIdx) => grid[rowIdx]?.[colIdx]
+
 module.exports = {
   add,
   createPriorityQueue,
@@ -292,6 +294,7 @@ module.exports = {
   reduce,
   rotateClockwise,
   rotateCounterClockwise,
+  safeGridGet,
   spread,
   subtract,
   sum,

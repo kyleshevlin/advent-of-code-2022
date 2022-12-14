@@ -1,4 +1,4 @@
-const { getData, createQueue } = require('../utils')
+const { getData, createQueue, safeGridGet } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -76,16 +76,6 @@ function gridToGraph(grid) {
     }
   }
 
-  // Safely try to get a neighbor item, doesn't break on items outside of the
-  // range of the arrays
-  function safeGridGet(rowIdx, colIdx) {
-    try {
-      return grid[rowIdx][colIdx]
-    } catch (err) {
-      return undefined
-    }
-  }
-
   function getNodeKey(rowIdx, colIdx) {
     return `${rowIdx}-${colIdx}`
   }
@@ -108,7 +98,7 @@ function gridToGraph(grid) {
       const neighborIndexes = getNeighborIndices(rowIdx, colIdx)
 
       for (const [neighborRowIdx, neighborColIdx] of neighborIndexes) {
-        const neighborChar = safeGridGet(neighborRowIdx, neighborColIdx)
+        const neighborChar = safeGridGet(grid, neighborRowIdx, neighborColIdx)
 
         if (!neighborChar) continue
 
