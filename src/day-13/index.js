@@ -22,6 +22,8 @@ function parseInput(input) {
     .map(pairs => pairs.split('\n').map(JSON.parse))
 }
 
+const isNumber = x => typeof x === 'number'
+
 const toArray = x => (Array.isArray(x) ? x : [x])
 
 function compareLists(left, right) {
@@ -32,7 +34,7 @@ function compareLists(left, right) {
     const leftItem = cloneLeft.shift()
     const rightItem = cloneRight.shift()
 
-    if (typeof leftItem === 'number' && typeof rightItem === 'number') {
+    if (isNumber(leftItem) && isNumber(rightItem)) {
       if (leftItem < rightItem) return 'correct'
       if (leftItem > rightItem) return 'wrong'
       if (leftItem === rightItem) continue
