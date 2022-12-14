@@ -2,6 +2,10 @@ const { createRange, getData } = require('../utils')
 
 const data = getData(__dirname)
 
+const AIR = '.'
+const ROCK = '#'
+const SAND = 'o'
+
 function parseInput(input) {
   return input
     .trim()
@@ -62,14 +66,14 @@ function placeRocks(rocks, grid, xOffset, yOffset) {
       const { x: aX, y: aY } = a
       const { x: bX, y: bY } = b
 
-      gridClone[aY][aX] = '#'
-      gridClone[bY][bX] = '#'
+      gridClone[aY][aX] = ROCK
+      gridClone[bY][bX] = ROCK
 
       if (aX === bX) {
         const range = createRange(aY, bY)
 
         for (const y of range) {
-          gridClone[y][aX] = '#'
+          gridClone[y][aX] = ROCK
         }
       }
 
@@ -77,7 +81,7 @@ function placeRocks(rocks, grid, xOffset, yOffset) {
         const range = createRange(aX, bX)
 
         for (const x of range) {
-          gridClone[aY][x] = '#'
+          gridClone[aY][x] = ROCK
         }
       }
 
@@ -90,15 +94,21 @@ function placeRocks(rocks, grid, xOffset, yOffset) {
 
 const STARTING_POINT = [500, 0]
 
-function createSimulation(input) {
-  const rocks = parseInput(input)
-  const { xDomain, yDomain } = getDimensions(rocks)
+function createSimulation(rocks, xDomain, yDomain) {
   const grid = createGrid(xDomain, yDomain)
   const [xMin, xMax] = xDomain
   const xOffset = xMax - (xMax - xMin)
   const [, yOffset] = yDomain
   const withRocks = placeRocks(rocks, grid, xOffset, yOffset)
   let isComplete = false
+
+  const safeGridGet = (y, x) => {
+    try {
+      return withRocks[y][x]
+    } catch (err) {
+      return undefined
+    }
+  }
 
   return {
     getState() {
@@ -109,15 +119,12 @@ function createSimulation(input) {
     },
     tick() {
       const [startX, startY] = STARTING_POINT
-      let falling = true
       let sand = [startX - xOffset, startY]
+      let falling = true
 
-      const safeGridGet = (y, x) => {
-        try {
-          return withRocks[y][x]
-        } catch (err) {
-          return undefined
-        }
+      if (withRocks[startY][startX - xOffset] === SAND) {
+        isComplete = true
+        return
       }
 
       while (falling) {
@@ -132,17 +139,17 @@ function createSimulation(input) {
           break
         }
 
-        if (down === '.') {
+        if (down === AIR) {
           sand = [x, y + 1]
           continue
         }
 
-        if (downLeft === '.') {
+        if (downLeft === AIR) {
           sand = [x - 1, y + 1]
           continue
         }
 
-        if (downRight === '.') {
+        if (downRight === AIR) {
           sand = [x + 1, y + 1]
           continue
         }
@@ -152,14 +159,16 @@ function createSimulation(input) {
 
       if (!isComplete) {
         const [x, y] = sand
-        withRocks[y][x] = 'o'
+        withRocks[y][x] = SAND
       }
     },
   }
 }
 
 function solution1(input) {
-  const sim = createSimulation(input)
+  const rocks = parseInput(input)
+  const { xDomain, yDomain } = getDimensions(rocks)
+  const sim = createSimulation(rocks, xDomain, yDomain)
   let isComplete = false
   let i = 0
 
@@ -176,10 +185,40 @@ function solution1(input) {
 // const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 1078
 
-function solution2(input) {}
+/**
+ * I can maybe figure out how to dynamically size this up later but until then,
+ * I just kept increasing this padding until the answer kept coming out the same
+ */
+const X_PAD = 300
+
+function solution2(input) {
+  const rocks = parseInput(input)
+  const { xDomain, yDomain } = getDimensions(rocks)
+  const [xMin, xMax] = xDomain
+  const [, yMax] = yDomain
+  const increasedXDomain = [xMin - X_PAD, xMax + X_PAD]
+  const increasedYDomain = [0, yMax + 2]
+  const floorRock = [
+    { x: xMin - X_PAD, y: yMax + 2 },
+    { x: xMax + X_PAD, y: yMax + 2 },
+  ]
+  const withFloor = [...rocks, floorRock]
+  const sim = createSimulation(withFloor, increasedXDomain, increasedYDomain)
+  let isComplete = false
+  let i = 0
+
+  while (!isComplete) {
+    sim.tick()
+    isComplete = sim.getState().isComplete
+
+    if (!isComplete) i++
+  }
+
+  return i
+}
 
 // const secondAnswer = solution2(data)
-// console.log(secondAnswer)
+// console.log(secondAnswer) // 30157
 
 module.exports = {
   solution1,
