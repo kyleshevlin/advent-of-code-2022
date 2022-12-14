@@ -22,15 +22,15 @@ function getDimensions(rocks) {
   const xs = rocks.flatMap(rock => rock.map(({ x }) => x))
   const ys = rocks.flatMap(rock => rock.map(({ y }) => y))
 
-  return {
-    xDomain: [Math.min(...xs), Math.max(...xs)],
-    yDomain: [0, Math.max(...ys)],
-  }
+  const xMin = Math.min(...xs)
+  const xMax = Math.max(...xs)
+  const yMax = Math.max(...ys)
+
+  return { xMin, xMax, yMax }
 }
 
-function createGrid(xDomain, yDomain) {
-  const [xMin, xMax] = xDomain
-  const [, yMax] = yDomain
+function createGrid(dimensions) {
+  const { xMin, xMax, yMax } = dimensions
   const result = []
 
   for (let i = 0; i <= yMax; i++) {
@@ -50,7 +50,7 @@ function drawGrid(grid) {
   return `\n${grid.map(row => row.join('')).join('\n')}\n`
 }
 
-function placeRocks(rocks, grid, xOffset, yOffset) {
+function placeRocks(rocks, grid, xOffset) {
   const gridClone = [...grid.map(row => [...row])]
   const offsetRocks = rocks.map(rock =>
     rock.map(point => ({ ...point, x: point.x - xOffset }))
@@ -94,12 +94,13 @@ function placeRocks(rocks, grid, xOffset, yOffset) {
 
 const STARTING_POINT = [500, 0]
 
-function createSimulation(rocks, xDomain, yDomain) {
-  const grid = createGrid(xDomain, yDomain)
-  const [xMin, xMax] = xDomain
+function createSimulation(rocks, dimensions) {
+  const grid = createGrid(dimensions)
+
+  const { xMin, xMax } = dimensions
   const xOffset = xMax - (xMax - xMin)
-  const [, yOffset] = yDomain
-  const withRocks = placeRocks(rocks, grid, xOffset, yOffset)
+  const withRocks = placeRocks(rocks, grid, xOffset)
+
   let isComplete = false
 
   const safeGridGet = (y, x) => {
@@ -167,11 +168,11 @@ function createSimulation(rocks, xDomain, yDomain) {
 
 function solution1(input) {
   const rocks = parseInput(input)
-  const { xDomain, yDomain } = getDimensions(rocks)
-  const sim = createSimulation(rocks, xDomain, yDomain)
+  const dimensions = getDimensions(rocks)
+  const sim = createSimulation(rocks, dimensions)
+
   let isComplete = false
   let i = 0
-
   while (!isComplete) {
     sim.tick()
     isComplete = sim.getState().isComplete
@@ -193,20 +194,23 @@ const X_PAD = 175
 
 function solution2(input) {
   const rocks = parseInput(input)
-  const { xDomain, yDomain } = getDimensions(rocks)
-  const [xMin, xMax] = xDomain
-  const [, yMax] = yDomain
-  const increasedXDomain = [xMin - X_PAD, xMax + X_PAD]
-  const increasedYDomain = [0, yMax + 2]
+  const { xMin, xMax, yMax } = getDimensions(rocks)
+  const xMinAdj = xMin - X_PAD
+  const xMaxAdj = xMax + X_PAD
+  const yMaxAdj = yMax + 2
   const floorRock = [
-    { x: xMin - X_PAD, y: yMax + 2 },
-    { x: xMax + X_PAD, y: yMax + 2 },
+    { x: xMinAdj, y: yMaxAdj },
+    { x: xMaxAdj, y: yMaxAdj },
   ]
   const withFloor = [...rocks, floorRock]
-  const sim = createSimulation(withFloor, increasedXDomain, increasedYDomain)
+  const sim = createSimulation(withFloor, {
+    xMin: xMinAdj,
+    xMax: xMaxAdj,
+    yMax: yMaxAdj,
+  })
+
   let isComplete = false
   let i = 0
-
   while (!isComplete) {
     sim.tick()
     isComplete = sim.getState().isComplete
