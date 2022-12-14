@@ -90,10 +90,26 @@ function createStack() {
   }
 }
 
+const inc = x => x + 1
+const dec = x => x - 1
+const lessThanOrEqualTo = (x, y) => x <= y
+const greaterThanOrEqualTo = (x, y) => x >= y
+
 function createRange(from, to) {
   const result = []
 
-  for (let i = from; i <= to; i++) {
+  let change = inc
+  let comparison = lessThanOrEqualTo
+
+  const diff = to - from
+
+  if (Math.sign(diff) === -1) {
+    change = dec
+    comparison = greaterThanOrEqualTo
+  }
+
+  let i
+  for (i = from; comparison(i, to); i = change(i)) {
     result.push(i)
   }
 
