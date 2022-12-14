@@ -189,7 +189,7 @@ function solution1(input) {
  * I can maybe figure out how to dynamically size this up later but until then,
  * I just kept increasing this padding until the answer kept coming out the same
  */
-const X_PAD = 300
+const X_PAD = 175
 
 function solution2(input) {
   const rocks = parseInput(input)
@@ -217,8 +217,8 @@ function solution2(input) {
   return i
 }
 
-// const secondAnswer = solution2(data)
-// console.log(secondAnswer) // 30157
+const secondAnswer = solution2(data)
+console.log(secondAnswer) // 30157
 
 module.exports = {
   solution1,
