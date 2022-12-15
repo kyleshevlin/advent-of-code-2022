@@ -157,6 +157,45 @@ function solution1(input, at) {
 
 function solution2(input, max) {
   const items = parseInput(input)
+  const dimensions = getDimensions(items)
+  const grid = createGrid(dimensions)
+  const { xMax, xMin } = dimensions
+  const xOffset = xMax - (xMax - xMin)
+  const withItems = placeItems(grid, items, xOffset)
+
+  let x = 0
+  let y = 0
+
+  const rowsWithPotential = withItems
+    .map((row, rowIdx) => ({ row, rowIdx }))
+    .filter(item => {
+      return item.row.join('').includes('#.#')
+    })
+
+  for (const { row, rowIdx } of rowsWithPotential) {
+    for (const [colIdx, item] of row.entries()) {
+      if (item !== '.') continue
+
+      const neighbors = [
+        safeGridGet(withItems, rowIdx, colIdx - 1),
+        safeGridGet(withItems, rowIdx, colIdx + 1),
+        safeGridGet(withItems, rowIdx - 1, colIdx - 1),
+        safeGridGet(withItems, rowIdx - 1, colIdx),
+        safeGridGet(withItems, rowIdx - 1, colIdx + 1),
+        safeGridGet(withItems, rowIdx + 1, colIdx - 1),
+        safeGridGet(withItems, rowIdx + 1, colIdx),
+        safeGridGet(withItems, rowIdx + 1, colIdx + 1),
+      ]
+
+      if (neighbors.every(n => n === '#')) {
+        x = colIdx + xOffset
+        y = rowIdx
+        break
+      }
+    }
+  }
+
+  return x * 4000000 + y
 }
 
 // const secondAnswer = solution2(data, 4000000)
