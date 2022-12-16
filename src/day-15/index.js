@@ -230,7 +230,7 @@ function findUndetectedBeacon(items, min, max) {
     ])
   }
 
-  const intersections = new Set()
+  const intersections = []
 
   for (const boundary1 of sensorBoundaries) {
     for (const boundary2 of sensorBoundaries) {
@@ -239,28 +239,18 @@ function findUndetectedBeacon(items, min, max) {
           const intersection = getLineIntersection(line1, line2)
 
           if (!intersection) continue
-          const { x, y } = intersection
 
-          intersections.add(makeKey(x, y))
+          intersections.push(intersection)
         }
       }
     }
   }
 
-  for (const item of items) {
-    const { sensor, beacon } = item
-    intersections.delete(makeKey(sensor.x, sensor.y))
-    intersections.delete(makeKey(beacon.x, beacon.y))
-  }
-
-  const cloneIntersections = new Set(intersections)
-
   let result
   for (const intersection of intersections) {
-    const [x, y] = intersection.split(',').map(Number).map(Math.round)
+    const { x, y } = intersection
 
     if (x < min || x > max || y < min || y > max) {
-      cloneIntersections.delete(makeKey(x, y))
       continue
     }
 
@@ -268,15 +258,18 @@ function findUndetectedBeacon(items, min, max) {
     for (const { sensor, distance } of sensorWithDistances) {
       const intersectionDistance = getDistance(sensor.x, sensor.y, x, y)
 
-      // If this is less than the sensor to beacon distance, it means there was
-      // boundary overlap
       if (intersectionDistance <= distance) {
         detected = true
         break
       }
     }
 
-    if (!detected) result = { x, y }
+    // The first intersection that isn't detected by any sensor is sitting
+    // between all the sensors and thus is our undetected beacon
+    if (!detected) {
+      result = { x, y }
+      break
+    }
   }
 
   return result
