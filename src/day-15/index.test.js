@@ -22,5 +22,5 @@ test('solution1', () => {
 })
 
 test('solution2', () => {
-  expect(solution2(input, 20)).toEqual(56000011)
+  expect(solution2(input, 0, 20)).toEqual(56000011)
 })

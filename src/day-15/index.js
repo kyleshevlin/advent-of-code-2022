@@ -69,11 +69,21 @@ function createGrid(dimensions) {
   return result
 }
 
-function drawGrid(grid) {
-  return `\n${grid.map(row => row.join('')).join('\n')}\n`
+const getDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2)
+
+const letters = 'abcdefghijklmnopqrstuvwxyz'.split('')
+function letterGetter() {
+  let index = 0
+
+  return () => {
+    const result = letters[index]
+    index++
+    if (index >= letters.length) index = 0
+    return result
+  }
 }
 
-const getDistance = (x1, y1, x2, y2) => Math.abs(x1 - x2) + Math.abs(y1 - y2)
+const getNextLetter = letterGetter()
 
 function placeItems(grid, items, xOffset) {
   const cloneGrid = [...grid.map(row => [...row])]
@@ -88,6 +98,7 @@ function placeItems(grid, items, xOffset) {
 
     const xRange = createRange(sensor.x - distance, sensor.x + distance)
     const yRange = createRange(sensor.y - distance, sensor.y + distance)
+    const letter = getNextLetter()
 
     for (const x of xRange) {
       for (const y of yRange) {
@@ -97,8 +108,8 @@ function placeItems(grid, items, xOffset) {
 
         const item = safeGridGet(cloneGrid, y, x - xOffset)
 
-        if (item === '.') {
-          cloneGrid[y][x - xOffset] = '#'
+        if (item === '.' || item === '-') {
+          cloneGrid[y][x - xOffset] = _distance === distance ? letter : '-'
         }
       }
     }
@@ -107,19 +118,30 @@ function placeItems(grid, items, xOffset) {
   return cloneGrid
 }
 
-function getBeaconlessCount(items, at) {
-  const filled = new Map()
-  let result = 0
+function drawGrid(items) {
+  const dimensions = getDimensions(items)
+  const grid = createGrid(dimensions)
+  const { xMax, xMin } = dimensions
+  const xOffset = xMax - (xMax - xMin)
+  const withItems = placeItems(grid, items, xOffset)
 
-  function makeKey(x, y) {
-    return `${x},${y}`
-  }
+  return `\n${withItems.map(row => row.join('')).join('\n')}\n`
+}
+
+function makeKey(x, y) {
+  return `${x},${y}`
+}
+
+function getSets(items, at) {
+  const sensors = new Set()
+  const beacons = new Set()
+  const beaconless = new Set()
 
   for (const item of items) {
     const { sensor, beacon } = item
 
-    if (sensor.y === at) filled.set(makeKey(sensor.x, sensor.y), 'S')
-    if (beacon.y === at) filled.set(makeKey(beacon.x, beacon.y), 'B')
+    if (sensor.y === at) sensors.add(makeKey(sensor.x, sensor.y))
+    if (beacon.y === at) beacons.add(makeKey(beacon.x, beacon.y))
 
     const distance = getDistance(sensor.x, sensor.y, beacon.x, beacon.y)
 
@@ -135,71 +157,141 @@ function getBeaconlessCount(items, at) {
 
       const key = makeKey(x, at)
 
-      if (!filled.has(key)) {
-        filled.set(key, '#')
-        result++
+      if (!sensors.has(key) && !beacons.has(key) && !beaconless.has(key)) {
+        beaconless.add(key)
       }
     }
   }
 
-  return result
+  return { sensors, beacons, beaconless }
 }
 
 function solution1(input, at) {
   const items = parseInput(input)
-  const result = getBeaconlessCount(items, at)
+  const { beaconless } = getSets(items, at)
 
-  return result
+  return beaconless.size
 }
 
 // const firstAnswer = solution1(data, 2000000)
 // console.log(firstAnswer) // 5564017
 
-function solution2(input, max) {
-  const items = parseInput(input)
-  const dimensions = getDimensions(items)
-  const grid = createGrid(dimensions)
-  const { xMax, xMin } = dimensions
-  const xOffset = xMax - (xMax - xMin)
-  const withItems = placeItems(grid, items, xOffset)
+// found online:
+// line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
+// Determine the intersection point of two line segments
+function getLineIntersection(line1, line2) {
+  const [x1, y1, x2, y2] = line1
+  const [x3, y3, x4, y4] = line2
 
-  let x = 0
-  let y = 0
+  // Check if none of the lines are of length 0
+  if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) return
 
-  const rowsWithPotential = withItems
-    .map((row, rowIdx) => ({ row, rowIdx }))
-    .filter(item => {
-      return item.row.join('').includes('#.#')
-    })
+  const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
 
-  for (const { row, rowIdx } of rowsWithPotential) {
-    for (const [colIdx, item] of row.entries()) {
-      if (item !== '.') continue
+  // Lines are parallel
+  if (denominator === 0) return
 
-      const neighbors = [
-        safeGridGet(withItems, rowIdx, colIdx - 1),
-        safeGridGet(withItems, rowIdx, colIdx + 1),
-        safeGridGet(withItems, rowIdx - 1, colIdx - 1),
-        safeGridGet(withItems, rowIdx - 1, colIdx),
-        safeGridGet(withItems, rowIdx - 1, colIdx + 1),
-        safeGridGet(withItems, rowIdx + 1, colIdx - 1),
-        safeGridGet(withItems, rowIdx + 1, colIdx),
-        safeGridGet(withItems, rowIdx + 1, colIdx + 1),
-      ]
+  const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator
+  const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator
 
-      if (neighbors.every(n => n === '#')) {
-        x = colIdx + xOffset
-        y = rowIdx
-        break
+  // is the intersection along the segments
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return
+
+  const x = x1 + ua * (x2 - x1)
+  const y = y1 + ua * (y2 - y1)
+
+  return { x, y }
+}
+
+function findUndetectedBeacon(items, min, max) {
+  const sensorWithDistances = []
+
+  const sensorBoundaries = []
+
+  for (const item of items) {
+    const { sensor, beacon } = item
+    const distance = getDistance(sensor.x, sensor.y, beacon.x, beacon.y)
+
+    sensorWithDistances.push({ sensor, distance })
+
+    const boundary = distance + 1
+
+    const { x, y } = sensor
+    const top = [x, y - boundary]
+    const right = [x + boundary, y]
+    const bottom = [x, y + boundary]
+    const left = [x - boundary, y]
+
+    sensorBoundaries.push([
+      [...top, ...right],
+      [...right, ...bottom],
+      [...bottom, ...left],
+      [...left, ...top],
+    ])
+  }
+
+  const intersections = new Set()
+
+  for (const boundary1 of sensorBoundaries) {
+    for (const boundary2 of sensorBoundaries) {
+      for (const line1 of boundary1) {
+        for (const line2 of boundary2) {
+          const intersection = getLineIntersection(line1, line2)
+
+          if (!intersection) continue
+          const { x, y } = intersection
+
+          intersections.add(makeKey(x, y))
+        }
       }
     }
   }
 
+  for (const item of items) {
+    const { sensor, beacon } = item
+    intersections.delete(makeKey(sensor.x, sensor.y))
+    intersections.delete(makeKey(beacon.x, beacon.y))
+  }
+
+  const cloneIntersections = new Set(intersections)
+
+  let result
+  for (const intersection of intersections) {
+    const [x, y] = intersection.split(',').map(Number).map(Math.round)
+
+    if (x < min || x > max || y < min || y > max) {
+      cloneIntersections.delete(makeKey(x, y))
+      continue
+    }
+
+    let detected = false
+    for (const { sensor, distance } of sensorWithDistances) {
+      const intersectionDistance = getDistance(sensor.x, sensor.y, x, y)
+
+      // If this is less than the sensor to beacon distance, it means there was
+      // boundary overlap
+      if (intersectionDistance <= distance) {
+        detected = true
+        break
+      }
+    }
+
+    if (!detected) result = { x, y }
+  }
+
+  return result
+}
+
+function solution2(input, min, max) {
+  const items = parseInput(input)
+  // console.log(drawGrid(items))
+  const { x, y } = findUndetectedBeacon(items, min, max)
+
   return x * 4000000 + y
 }
 
-// const secondAnswer = solution2(data, 4000000)
-// console.log(secondAnswer)
+// const secondAnswer = solution2(data, 0, 4000000)
+// console.log(secondAnswer) // 11558423398893
 
 module.exports = {
   solution1,
