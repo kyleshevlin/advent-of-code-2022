@@ -215,6 +215,18 @@ function union(...sets) {
   return result
 }
 
+function isDisjoint(a, b) {
+  for (const item of a) {
+    if (b.has(item)) return false
+  }
+
+  for (const item of b) {
+    if (a.has(item)) return false
+  }
+
+  return true
+}
+
 /**
  * Functional Programming helpers
  */
@@ -318,6 +330,7 @@ module.exports = {
   getLineIntersection,
   getManhattanDistance,
   intersection,
+  isDisjoint,
   map,
   multiply,
   pipe,
