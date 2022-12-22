@@ -227,6 +227,16 @@ function isDisjoint(a, b) {
   return true
 }
 
+function setDifference(a, b) {
+  const result = new Set(a)
+
+  for (const item of b) {
+    if (result.has(item)) result.delete(item)
+  }
+
+  return result
+}
+
 /**
  * Functional Programming helpers
  */
@@ -340,6 +350,7 @@ module.exports = {
   rotateClockwise,
   rotateCounterClockwise,
   safeGridGet,
+  setDifference,
   spread,
   subtract,
   sum,

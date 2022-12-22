@@ -21,5 +21,5 @@ test('solution1', () => {
 })
 
 test('solution2', () => {
-  expect(solution2(input)).toEqual(undefined)
+  expect(solution2(input)).toEqual(58)
 })
