@@ -86,7 +86,7 @@ function createSim(moves) {
   return {
     getState() {
       return {
-        grid,
+        grid: [...grid.map(row => [...row])],
         rockCount,
         rockIdx,
         moveIdx,
@@ -164,10 +164,62 @@ function solution1(input) {
 // const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 3147
 
-function solution2(input) {}
+const SECOND_ROCKS_COUNT = 1000000000000
+
+function solution2(input) {
+  const moves = parseInput(input)
+  const sim = createSim(moves)
+
+  // Gotta find a cycle so I can compute this, gah.
+  const cache = {}
+  let first
+  let second
+  let hit = false
+  while (!hit) {
+    sim.tick()
+
+    const state = sim.getState()
+    const { rockIdx, moveIdx, grid } = state
+    const key = `${rockIdx}-${moveIdx}-${grid
+      .slice(0, 5)
+      .map(r => r.join(''))
+      .join('')}`
+
+    if (cache[key]) {
+      hit = true
+      first = cache[key]
+      second = state
+      break
+    }
+
+    cache[key] = state
+  }
+
+  const firstHeight = first.grid.length
+  const firstCount = first.rockCount
+
+  const secondHeight = second.grid.length
+  const secondCount = second.rockCount
+
+  const periodHeight = secondHeight - firstHeight
+  const periodCount = secondCount - firstCount
+
+  const remainingCount = SECOND_ROCKS_COUNT - firstCount
+  const periods = Math.floor(remainingCount / periodCount)
+  const totalPeriodsHeight = periods * periodHeight
+  const remainder = remainingCount % periodCount
+
+  const sim2 = createSim(moves)
+
+  while (sim2.getState().rockCount < firstCount + remainder) {
+    sim2.tick()
+  }
+
+  return totalPeriodsHeight + sim2.getState().grid.length
+}
 
 // const secondAnswer = solution2(data)
-// console.log(secondAnswer)
+// console.log(secondAnswer) // 1532163742758
 
 module.exports = {
   solution1,
