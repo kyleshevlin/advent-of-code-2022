@@ -45,8 +45,23 @@ function parseInput(input) {
     })
 }
 
+function getBestResultForBlueprint(blueprint) {
+  const results = []
+
+  /**
+   * TODO: implement an algorithm that walks every possible branch for
+   * the blueprint, returning the best result.
+   */
+
+  return Math.max(...results)
+}
+
 function solution1(input) {
-  return parseInput(input)
+  const blueprints = parseInput(input)
+  const bestResults = blueprints.map(getBestResultForBlueprint)
+  const result = bestResults.reduce((acc, cur, idx) => acc + cur * idx, 0)
+
+  return result
 }
 
 // const firstAnswer = solution1(data)
