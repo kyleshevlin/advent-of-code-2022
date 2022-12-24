@@ -25,45 +25,39 @@ function createLinkedList(items) {
   const [first, ...rest] = items
 
   const head = createNode(first)
+  let zeroNode
 
-  let tail = head
+  let previousNode = head
   for (const item of rest) {
     const node = createNode(item)
-    node.previous = tail
-    tail.next = node
-    tail = node
+
+    if (item.value === 0) zeroNode = node
+
+    node.previous = previousNode
+    previousNode.next = node
+    previousNode = node
   }
 
-  // Make it an ouroboros
-  tail.next = head
-  head.previous = tail
+  // Make it an ouroboros (a cycle)
+  previousNode.next = head
+  head.previous = previousNode
 
   return {
-    head,
-    tail,
+    zeroNode,
     find(predicate) {
-      let node = this.head
+      let node = zeroNode
 
       do {
         if (predicate(node)) return node
         node = node.next
-      } while (node !== this.head)
+      } while (node !== zeroNode)
 
       return null
     },
     delete(node) {
       const { previous, next } = node
-
       next.previous = previous
       previous.next = next
-
-      if (node === this.head) {
-        this.head = next
-      }
-
-      if (node === this.tail) {
-        this.tail = previous
-      }
     },
     insert(node, insertionNode, method) {
       const adjacentNode = insertionNode[method]
@@ -80,22 +74,31 @@ function createLinkedList(items) {
     },
     print() {
       const values = []
-      let node = this.head
+      let node = zeroNode
 
       do {
         values.push(node.value.value)
         node = node.next
-      } while (node !== this.head)
+      } while (node !== zeroNode)
 
       return values
     },
   }
 }
 
-function solution1(input) {
-  const original = parseInput(input)
-  const list = createLinkedList(original)
+function getValues(list) {
+  return INDICES.map(idx => {
+    let node = list.zeroNode
 
+    for (let i = 0; i < idx; i++) {
+      node = node.next
+    }
+
+    return node.value.value
+  })
+}
+
+function mix(original, list) {
   for (const item of original) {
     const { idx, value } = item
 
@@ -106,7 +109,8 @@ function solution1(input) {
 
     let insertionNode = currentNode
     let i = 0
-    while (i < Math.abs(value)) {
+    // I still don't really understand why we modulate with the length of the list -1
+    while (i < Math.abs(value) % (original.length - 1)) {
       insertionNode = insertionNode[method]
       i++
     }
@@ -114,31 +118,40 @@ function solution1(input) {
     list.delete(currentNode)
     list.insert(currentNode, insertionNode, method)
   }
-
-  console.log(list.print())
-
-  const zeroNode = list.find(n => n.value.value === 0)
-
-  const results = INDICES.map(idx => {
-    let node = zeroNode
-
-    for (let i = 0; i < idx; i++) {
-      node = node.next
-    }
-
-    return node.value.value
-  })
-
-  return sum(results)
 }
 
-const firstAnswer = solution1(data)
-console.log(firstAnswer)
+function solution1(input) {
+  const original = parseInput(input)
+  const list = createLinkedList(original)
 
-function solution2(input) {}
+  mix(original, list)
 
-const secondAnswer = solution2(data)
-// console.log(secondAnswer)
+  const values = getValues(list)
+  return sum(values)
+}
+
+// const firstAnswer = solution1(data)
+// console.log(firstAnswer) // 6712
+
+const ENCRYPTION_KEY = 811589153
+
+function solution2(input) {
+  const original = parseInput(input).map(x => ({
+    ...x,
+    value: x.value * ENCRYPTION_KEY,
+  }))
+  const list = createLinkedList(original)
+
+  for (let i = 0; i < 10; i++) {
+    mix(original, list)
+  }
+
+  const values = getValues(list)
+  return sum(values)
+}
+
+// const secondAnswer = solution2(data)
+// console.log(secondAnswer) // 1595584274798
 
 module.exports = {
   solution1,
