@@ -1,9 +1,17 @@
 const { solution1, solution2 } = require('./')
 
-const input = ``
+const input = `
+1
+2
+-3
+3
+-2
+0
+4
+`
 
 test('solution1', () => {
-  expect(solution1(input)).toEqual(undefined)
+  expect(solution1(input)).toEqual(3)
 })
 
 test('solution2', () => {
