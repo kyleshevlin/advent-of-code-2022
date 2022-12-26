@@ -327,6 +327,17 @@ function getLineIntersection(line1, line2) {
   return { x, y }
 }
 
+function zip(a, b) {
+  const result = []
+
+  while (a.length || b.length) {
+    if (a.length) result.push(a.shift())
+    if (b.length) result.push(b.shift())
+  }
+
+  return result
+}
+
 module.exports = {
   add,
   createPriorityQueue,
@@ -357,4 +368,5 @@ module.exports = {
   trace,
   traverse,
   union,
+  zip,
 }
