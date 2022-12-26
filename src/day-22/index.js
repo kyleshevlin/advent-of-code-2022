@@ -216,7 +216,33 @@ function solution1(input) {
 // const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 58248
 
-function solution2(input) {}
+function mapToGrids(map, rowsAndColsOfGrids) {
+  const grid = mapToGrid(map)
+
+  const grids = rowsAndColsOfGrids.map(([rows, cols]) => {
+    const result = []
+
+    for (let i = rows[0]; i < rows[1]; i++) {
+      const r = []
+      for (let j = cols[0]; j < cols[1]; j++) {
+        r.push(grid[i][j])
+      }
+
+      result.push(r)
+    }
+
+    return result
+  })
+
+  return grids
+}
+
+function solution2(input, rowsAndColsOfGrids) {
+  const [map, moves] = parseInput(input)
+  const grids = mapToGrids(map, rowsAndColsOfGrids)
+
+  return grids.map(drawGrid)
+}
 
 // const secondAnswer = solution2(data)
 // console.log(secondAnswer)
