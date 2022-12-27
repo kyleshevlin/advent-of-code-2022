@@ -1,9 +1,16 @@
 const { solution1, solution2 } = require('./')
 
-const input = ``
+const input = `
+#.######
+#>>.<^<#
+#.<..<<#
+#>v.><>#
+#<^v^^>#
+######.#
+`
 
 test('solution1', () => {
-  expect(solution1(input)).toEqual(undefined)
+  expect(solution1(input)).toEqual(18)
 })
 
 test('solution2', () => {

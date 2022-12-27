@@ -338,6 +338,19 @@ function zip(a, b) {
   return result
 }
 
+function drawGrid(grid) {
+  return `\n${grid.map(row => row.join('')).join('\n')}\n`
+}
+
+function findLastIndex(arr, fn) {
+  const clone = [...arr].reverse()
+  const index = clone.findIndex(fn)
+
+  if (index === -1) return index
+
+  return clone.length - 1 - index
+}
+
 module.exports = {
   add,
   createPriorityQueue,
@@ -347,6 +360,8 @@ module.exports = {
   createTree,
   difference,
   divide,
+  drawGrid,
+  findLastIndex,
   getData,
   getLineIntersection,
   getManhattanDistance,
