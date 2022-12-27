@@ -1,4 +1,4 @@
-const { getData, findLastIndex, createQueue, safeGridGet } = require('../utils')
+const { getData, findLastIndex, safeGridGet, createQueue } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -133,8 +133,17 @@ function drawBlizzards(grid) {
     .join('\n')}\n`
 }
 
-function getNextNodes(grid, node, minutes, visited) {
-  const [row, col] = node
+function strToGrid(str) {
+  return str
+    .trim()
+    .split('\n')
+    .map(line => line.split(''))
+}
+
+function getNextNodes(row, col, iterations, minutes, modulator, visited) {
+  const minutesKey = minutes % modulator
+  const gridAsString = iterations[minutesKey]
+  const grid = strToGrid(gridAsString)
   const tiles = [
     [row - 1, col],
     [row, col - 1],
@@ -144,9 +153,9 @@ function getNextNodes(grid, node, minutes, visited) {
   ]
 
   return tiles.filter(([r, c]) => {
-    const key = `${r}-${c}-${minutes % (grid.length * grid[0].length)}`
-    const arr = safeGridGet(grid, r, c) ?? []
-    const isAvailable = arr.includes('.')
+    const key = `${r}-${c}-${minutesKey}`
+    const value = safeGridGet(grid, r, c)
+    const isAvailable = value === '.'
 
     return isAvailable && !visited[key]
   })
@@ -154,47 +163,56 @@ function getNextNodes(grid, node, minutes, visited) {
 
 function solution1(input) {
   const startingGrid = parseInput(input)
+  const modulator = (startingGrid.length - 2) * (startingGrid[0].length - 2)
+
   const sim = createSim(startingGrid)
-  const grid = sim.getState()
+  const iterations = {}
 
-  const start = [0, grid[0].findIndex(x => x.includes('.'))]
-  const end = [
-    grid.length - 1,
-    grid[grid.length - 1].findIndex(x => x.includes('.')),
-  ]
-
-  let currentNodes = [start]
-  let found = false
-  let minutes = 0
-
-  const visited = {}
-
-  while (!found) {
-    currentNodes.forEach(node => {
-      const [r, c] = node
-      visited[`${r}-${c}-${minutes % (grid.length * grid[0].length)}`] = true
-    })
-
+  let i = 0
+  while (i <= modulator) {
+    const grid = drawBlizzards(sim.getState())
+    iterations[i] = grid
+    i++
     sim.tick()
-    minutes++
-
-    const nextNodes = currentNodes
-      .map(node => getNextNodes(sim.getState(), node, minutes, visited))
-      .flat()
-
-    if (nextNodes.some(([r, c]) => r === end[0] && c === end[1])) {
-      found = true
-      break
-    }
-
-    currentNodes = nextNodes
   }
 
-  return minutes
+  const start = [0, startingGrid[0].findIndex(x => x.includes('.'))]
+  const end = [
+    startingGrid.length - 1,
+    startingGrid[startingGrid.length - 1].findIndex(x => x.includes('.')),
+  ]
+
+  const queue = createQueue()
+  queue.enqueue([start, 0])
+  const visited = {}
+
+  while (!queue.isEmpty()) {
+    const item = queue.dequeue()
+    const [[row, col], minutes] = item
+
+    if (row === end[0] && col === end[1]) return minutes
+
+    const nextNodes = getNextNodes(
+      row,
+      col,
+      iterations,
+      minutes + 1,
+      modulator,
+      visited
+    )
+
+    for (const node of nextNodes) {
+      queue.enqueue([node, minutes + 1])
+      const key = `${node[0]}-${node[1]}-${(minutes + 1) % modulator}`
+      visited[key] = true
+    }
+  }
+
+  return -1
 }
 
 // const firstAnswer = solution1(data)
-// console.log(firstAnswer)
+// console.log(firstAnswer) // 343
 
 function solution2(input) {}
 
