@@ -1,17 +1,22 @@
-const { safeGridGet, createRange, getManhattanDistance } = require('../utils')
+const {
+  safeGridGet,
+  createRange,
+  getManhattanDistance,
+  drawGrid,
+} = require('../utils')
 
 /**
  * While a grid was not a useful way to solve the problem, it was helpful to visualize
  * the test cases. I didn't want to delete the code, so I'm throwing it here.
  */
-function drawGrid(items) {
+function drawItems(items) {
   const dimensions = getDimensions(items)
   const grid = createGrid(dimensions)
   const { xMax, xMin } = dimensions
   const xOffset = xMax - (xMax - xMin)
   const withItems = placeItems(grid, items, xOffset)
 
-  return `\n${withItems.map(row => row.join('')).join('\n')}\n`
+  return drawGrid(withItems)
 }
 
 function getDimensions(items) {

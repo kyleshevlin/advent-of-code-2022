@@ -1,4 +1,4 @@
-const { createRange, getData, safeGridGet } = require('../utils')
+const { createRange, getData, safeGridGet, drawGrid } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -44,10 +44,6 @@ function createGrid(dimensions) {
   }
 
   return result
-}
-
-function drawGrid(grid) {
-  return `\n${grid.map(row => row.join('')).join('\n')}\n`
 }
 
 function placeRocks(rocks, grid, xOffset) {

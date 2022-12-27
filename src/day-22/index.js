@@ -1,4 +1,10 @@
-const { getData, zip, safeGridGet } = require('../utils')
+const {
+  getData,
+  zip,
+  safeGridGet,
+  drawGrid,
+  findLastIndex,
+} = require('../utils')
 
 const data = getData(__dirname)
 
@@ -66,15 +72,6 @@ function getNextPos(location, facing) {
 }
 
 const isNotVoid = x => x !== 'X'
-
-function findLastIndex(arr, fn) {
-  const clone = [...arr].reverse()
-  const index = clone.findIndex(fn)
-
-  if (index === -1) return index
-
-  return clone.length - 1 - index
-}
 
 function getWrapAroundPos(grid, location, facing) {
   const [row, col] = location
@@ -180,10 +177,6 @@ function addTrail(grid, trail) {
   }
 
   return clone
-}
-
-function drawGrid(grid) {
-  return `\n${grid.map(row => row.join('')).join('\n')}\n`
 }
 
 const FACING_VALUES = {

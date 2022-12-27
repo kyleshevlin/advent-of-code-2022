@@ -1,4 +1,4 @@
-const { getData, safeGridGet } = require('../utils')
+const { getData, safeGridGet, drawGrid, findLastIndex } = require('../utils')
 
 const data = getData(__dirname)
 
@@ -21,10 +21,6 @@ function getElves(grid) {
   return result
 }
 
-function drawGrid(grid) {
-  return `\n${grid.map(row => row.join('')).join('\n')}\n`
-}
-
 function expandGrid(grid) {
   const newLength = grid[0].length + 2
 
@@ -33,15 +29,6 @@ function expandGrid(grid) {
     ...grid.map(row => ['.', ...row, '.']),
     Array(newLength).fill('.'),
   ]
-}
-
-function findLastIndex(arr, fn) {
-  const clone = [...arr].reverse()
-  const index = clone.findIndex(fn)
-
-  if (index === -1) return index
-
-  return clone.length - 1 - index
 }
 
 function trimGrid(grid) {
