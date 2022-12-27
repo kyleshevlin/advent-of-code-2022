@@ -276,8 +276,8 @@ function solution2(input) {
   return i
 }
 
-const secondAnswer = solution2(data)
-console.log(secondAnswer)
+// const secondAnswer = solution2(data)
+// console.log(secondAnswer) // 999
 
 module.exports = {
   solution1,
