@@ -161,11 +161,7 @@ function getNextNodes(row, col, iterations, minutes, modulator, visited) {
   })
 }
 
-function solution1(input) {
-  const startingGrid = parseInput(input)
-  const modulator = (startingGrid.length - 2) * (startingGrid[0].length - 2)
-
-  const sim = createSim(startingGrid)
+function getIterations(sim, modulator) {
   const iterations = {}
 
   let i = 0
@@ -176,21 +172,19 @@ function solution1(input) {
     sim.tick()
   }
 
-  const start = [0, startingGrid[0].findIndex(x => x.includes('.'))]
-  const end = [
-    startingGrid.length - 1,
-    startingGrid[startingGrid.length - 1].findIndex(x => x.includes('.')),
-  ]
+  return iterations
+}
 
+function walkGrid(from, to, initialMinute, iterations, modulator) {
   const queue = createQueue()
-  queue.enqueue([start, 0])
+  queue.enqueue([from, initialMinute])
   const visited = {}
 
   while (!queue.isEmpty()) {
     const item = queue.dequeue()
     const [[row, col], minutes] = item
 
-    if (row === end[0] && col === end[1]) return minutes
+    if (row === to[0] && col === to[1]) return minutes
 
     const nextNodes = getNextNodes(
       row,
@@ -211,13 +205,45 @@ function solution1(input) {
   return -1
 }
 
+function solution1(input) {
+  const startingGrid = parseInput(input)
+  const modulator = (startingGrid.length - 2) * (startingGrid[0].length - 2)
+  const sim = createSim(startingGrid)
+  const iterations = getIterations(sim, modulator)
+
+  const start = [0, startingGrid[0].findIndex(x => x.includes('.'))]
+  const end = [
+    startingGrid.length - 1,
+    startingGrid[startingGrid.length - 1].findIndex(x => x.includes('.')),
+  ]
+
+  return walkGrid(start, end, 0, iterations, modulator)
+}
+
 // const firstAnswer = solution1(data)
 // console.log(firstAnswer) // 343
 
-function solution2(input) {}
+function solution2(input) {
+  const startingGrid = parseInput(input)
+  const modulator = (startingGrid.length - 2) * (startingGrid[0].length - 2)
+  const sim = createSim(startingGrid)
+  const iterations = getIterations(sim, modulator)
+
+  const start = [0, startingGrid[0].findIndex(x => x.includes('.'))]
+  const end = [
+    startingGrid.length - 1,
+    startingGrid[startingGrid.length - 1].findIndex(x => x.includes('.')),
+  ]
+
+  const first = walkGrid(start, end, 0, iterations, modulator)
+  const second = walkGrid(end, start, first, iterations, modulator)
+  const third = walkGrid(start, end, second, iterations, modulator)
+
+  return third
+}
 
 // const secondAnswer = solution2(data)
-// console.log(secondAnswer)
+// console.log(secondAnswer) // 960
 
 module.exports = {
   solution1,
