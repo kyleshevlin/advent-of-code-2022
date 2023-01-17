@@ -210,18 +210,20 @@ function solution1(input) {
 // console.log(firstAnswer) // 58248
 
 function mapToGrids(map, rowsAndColsOfGrids) {
-  const grid = mapToGrid(map)
+  const fullGrid = mapToGrid(map)
 
   const grids = rowsAndColsOfGrids.map(([rows, cols]) => {
+    const [rowStart, rowEnd] = rows
+    const [colStart, colEnd] = cols
     const result = []
 
-    for (let i = rows[0]; i < rows[1]; i++) {
-      const r = []
-      for (let j = cols[0]; j < cols[1]; j++) {
-        r.push(grid[i][j])
+    for (let r = rowStart; r < rowEnd; r++) {
+      const row = []
+      for (let c = colStart; c < colEnd; c++) {
+        row.push(fullGrid[r][c])
       }
 
-      result.push(r)
+      result.push(row)
     }
 
     return result
